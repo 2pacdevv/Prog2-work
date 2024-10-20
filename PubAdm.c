@@ -7,12 +7,10 @@ struct cliente {
     int id;  
     char nome[30];
     float divida;
-    float vezes_frequentadas;
     char numero[11];
 };
 
 int escolha = -1;
-
 
 int gerar_id_unico(FILE *arquivo) {
     int id;
@@ -24,8 +22,8 @@ int gerar_id_unico(FILE *arquivo) {
 
         rewind(arquivo);
         struct cliente cliente_atual;
-        while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nVezes frequentadas: %f\nNúmero: %s\n\n",
-                      &cliente_atual.id, cliente_atual.nome, &cliente_atual.divida, &cliente_atual.vezes_frequentadas, cliente_atual.numero) == 5) {
+        while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nNúmero: %s\n\n",
+                      &cliente_atual.id, cliente_atual.nome, &cliente_atual.divida, cliente_atual.numero) == 4) {
             if (cliente_atual.id == id) {
                 id_existe = 1; 
                 break;
@@ -38,7 +36,6 @@ int gerar_id_unico(FILE *arquivo) {
 
 void Cadastrar_cliente() {
     struct cliente *novo_cliente = malloc(sizeof(struct cliente));
-    struct cliente *cliente_atual = malloc(sizeof(struct cliente));
     float divida_total = 0.0;
     int cliente_existe = 0;
 
@@ -49,20 +46,19 @@ void Cadastrar_cliente() {
         return;
     }
     
-    srand(time(NULL)); 
-    novo_cliente->id = gerar_id_unico(arquivo);
+
 
     printf("Digite o nome do cliente: ");
     scanf(" %[^\n]", novo_cliente->nome);
     printf("Digite a dívida do cliente: ");
     scanf("%f", &novo_cliente->divida);
-    novo_cliente->vezes_frequentadas = 1;  
 
     rewind(arquivo);
-    while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nVezes frequentadas: %f\nNúmero: %s\n\n",
-                  &cliente_atual->id, cliente_atual->nome, &cliente_atual->divida, &cliente_atual->vezes_frequentadas, cliente_atual->numero) == 5) {
-        if (strcmp(cliente_atual->nome, novo_cliente->nome) == 0) {
-            divida_total = cliente_atual->divida + novo_cliente->divida;
+    struct cliente cliente_atual;
+    while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nNúmero: %s\n\n",
+                  &cliente_atual.id, cliente_atual.nome, &cliente_atual.divida, cliente_atual.numero) == 4) {
+        if (strcmp(cliente_atual.nome, novo_cliente->nome) == 0) {
+            divida_total = cliente_atual.divida + novo_cliente->divida;
             cliente_existe = 1;
             break;  
         }
@@ -73,34 +69,33 @@ void Cadastrar_cliente() {
         printf("Cliente já cadastrado. Atualizando a dívida...\n");
         novo_cliente->divida = divida_total;
     } else {
-        printf("Cliente não cadastrado. Digite o número do cliente: ");
+        printf("Digite o número do cliente: ");
         scanf("%s", novo_cliente->numero);
+        srand(time(NULL)); 
+         novo_cliente->id = gerar_id_unico(arquivo);
     }
 
     FILE *arquivo_temp = fopen("clientes_temp.txt", "w");
     if (arquivo_temp == NULL) {
         printf("Erro ao abrir o arquivo temporário para escrita!\n");
         free(novo_cliente);
-        free(cliente_atual);
         return;
     }
 
     arquivo = fopen("clientes.txt", "r");
     if (arquivo != NULL) {
-        while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nVezes frequentadas: %f\nNúmero: %s\n\n",
-                      &cliente_atual->id, cliente_atual->nome, &cliente_atual->divida, &cliente_atual->vezes_frequentadas, cliente_atual->numero) == 5) {
-            fprintf(arquivo_temp, "ID: %d\n", cliente_atual->id);
-            fprintf(arquivo_temp, "Nome: %s\n", cliente_atual->nome);
-            fprintf(arquivo_temp, "Dívida: %.2f\n", (strcmp(cliente_atual->nome, novo_cliente->nome) == 0) ? novo_cliente->divida : cliente_atual->divida);
-            fprintf(arquivo_temp, "Vezes frequentadas: %.2f\n", cliente_atual->vezes_frequentadas);
-            fprintf(arquivo_temp, "Número: %s\n\n", cliente_atual->numero);
+        while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nNúmero: %s\n\n",
+                      &cliente_atual.id, cliente_atual.nome, &cliente_atual.divida, cliente_atual.numero) == 4) {
+            fprintf(arquivo_temp, "ID: %d\n", cliente_atual.id);
+            fprintf(arquivo_temp, "Nome: %s\n", cliente_atual.nome);
+            fprintf(arquivo_temp, "Dívida: %.2f\n", (strcmp(cliente_atual.nome, novo_cliente->nome) == 0) ? novo_cliente->divida : cliente_atual.divida);
+            fprintf(arquivo_temp, "Número: %s\n\n", cliente_atual.numero);
         }
         fclose(arquivo);
     } else {
         printf("Erro ao abrir o arquivo para leitura!\n");
         fclose(arquivo_temp);
         free(novo_cliente);
-        free(cliente_atual);
         return;
     }
 
@@ -108,7 +103,6 @@ void Cadastrar_cliente() {
         fprintf(arquivo_temp, "ID: %d\n", novo_cliente->id);
         fprintf(arquivo_temp, "Nome: %s\n", novo_cliente->nome);
         fprintf(arquivo_temp, "Dívida: %.2f\n", novo_cliente->divida);
-        fprintf(arquivo_temp, "Vezes frequentadas: %.2f\n", novo_cliente->vezes_frequentadas);
         fprintf(arquivo_temp, "Número: %s\n\n", novo_cliente->numero);
     }
 
@@ -119,20 +113,82 @@ void Cadastrar_cliente() {
     printf("Cliente cadastrado/atualizado com sucesso! ID: %d\n", novo_cliente->id);
 
     free(novo_cliente);
-    free(cliente_atual);
 }
 
 void tela_inicial() {
-    printf("Bem-vindo ao aplicativo de administração de Pub\n");
     printf("Digite a funcionalidade que você deseja: \n");
-    printf("1 - Cadastrar cliente\n");
+    printf("1 - Atender Cliente\n");
     printf("2 - Verificar cliente\n");
     printf("3 - Cadastrar Produto\n");
     printf("4 - Alterar estoque\n");
     printf("5 - Emitir Relatório de vendas do dia\n");
 }
 
+void limpar_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF); 
+}
+
+void verificar_cliente() {
+    char nome_procurado[60];  
+    struct cliente cliente_atual; 
+    int encontrou = 0;  
+    int opcao = -1;  
+    
+
+
+    FILE *arquivo = fopen("clientes.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
+
+    limpar_buffer();
+
+    printf("Digite o nome do cliente que deseja procurar: ");
+    fgets(nome_procurado, 60, stdin); 
+    nome_procurado[strcspn(nome_procurado, "\n")] = 0;  
+
+    while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nDívida: %f\nNúmero: %s\n\n",
+                  &cliente_atual.id, cliente_atual.nome, &cliente_atual.divida, cliente_atual.numero) == 4) {
+        if (strstr(cliente_atual.nome, nome_procurado) != NULL) {
+            encontrou = 1;
+            printf("\nCliente encontrado:\n");
+            printf("ID: %d\nNome: %s\nDívida: %.2f\nNúmero: %s\n", 
+                   cliente_atual.id, cliente_atual.nome, cliente_atual.divida, cliente_atual.numero);
+
+            printf("Digite 1 para avançar para o próximo cliente, 0 para voltar ao cliente anterior, ou 9 para sair: ");
+            scanf("%d", &opcao);
+            limpar_buffer(); 
+
+            if (opcao == 9) { 
+                break;
+            } else if (opcao == 0) {
+                rewind(arquivo);
+                encontrou = 0;
+            }
+        }
+    }
+
+    if (!encontrou) {
+        printf("Cliente com nome '%s' não encontrado.\n", nome_procurado);
+    }
+
+    fclose(arquivo);
+}
+
+
+
+
+
+
+
+
+
+//função main banzas, da um naipe ae, vou tentar deixar ela o mais limpa possivel
 int main() {
+    printf("Bem-vindo ao aplicativo de administração de Pub\n");
+
     while (escolha != 0) {
         tela_inicial();
         scanf("%d", &escolha);
@@ -140,6 +196,9 @@ int main() {
             break;
         if (escolha == 1) {
             Cadastrar_cliente();
+        }
+         if (escolha == 2) {
+            verificar_cliente();
         }
     }
     return 0;
