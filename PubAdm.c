@@ -1,4 +1,5 @@
-#include "marcelos.h"
+#include "clientes.h"
+#include "produtos.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,9 @@ int main() {
     }
     if (escolha == 2) {
       verificar_cliente();
+    }
+    if (escolha == 3) {
+      Cadastrar_produto();
     }
   }
   return 0;
