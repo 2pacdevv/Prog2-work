@@ -1,4 +1,5 @@
 #include "clientes.h"
+#include "produtos.h"
 #include <stdio.h>
 #include <stdlib.h>
 int gerar_id_unico(FILE *arquivo) {
@@ -128,7 +129,11 @@ void Cadastrar_cliente() {
   free(novo_cliente);
 }
 
-void tela_inicial() {
+
+
+int tela_inicial() {
+  int opcao;
+
   printf("-----Menu Principal-----\n");
   printf("Digite a funcionalidade que você deseja: \n");
   printf("0 - Sair\n");
@@ -136,8 +141,52 @@ void tela_inicial() {
   printf("2 - Verificar cliente\n");
   printf("3 - Cadastrar Produto\n");
   printf("4 - Alterar estoque\n");
-  printf("5 - Emitir Relatório de vendas do dia\n");
+  printf("5 - Visualizar estoque\n");
+  printf("6 - Catálogo\n");
+  printf("7 - Alterar Catálogo\n");
+  printf("8 - Emitir Relatório de vendas do dia\n");
+
+  printf("Opção: ");
+  scanf("%d", &opcao);
+
+  switch (opcao) {
+    case 0:
+        break;
+    case 1:
+      Cadastrar_cliente();
+      return tela_inicial(); 
+      break;
+    case 2:
+      verificar_cliente();
+      return tela_inicial(); 
+      break;
+    case 3:
+      Cadastrar_produto();
+      return tela_inicial(); 
+      break;
+    case 4:
+      alterar_estoque();
+      return tela_inicial(); 
+      break;
+    case 5:
+      visualizar_estoque();
+      return tela_inicial(); 
+      break;
+    case 6:
+      printf("Alterando catálogo...\n");
+      return tela_inicial(); 
+      break;
+    case 7:
+      printf("Emitindo relatório de vendas...\n");
+      return tela_inicial(); 
+      break;
+    default:
+      printf("Opção inválida. Tente novamente.\n");
+     return tela_inicial(); 
+  }
+
 }
+
 
 void alterar_dados_cliente(int id_cliente) {
   struct cliente cliente_atual;
@@ -237,7 +286,6 @@ void verificar_cliente() {
       int escolha2 = -1;
       while (escolha2 != 0) {
         printf("Digite o que quer fazer: \n");
-        printf("0 - Voltar\n");
         printf("1 - Avançar\n");
         printf("9 - Sair\n");
         printf("2 - Selecionar Cliente\n");
@@ -247,16 +295,15 @@ void verificar_cliente() {
         if (opcao == 9) {
           fclose(arquivo);
           return;
-        } else if (opcao == 0) {
-          fclose(arquivo);
-          return;
-        } else if (opcao == 1) {
+        } 
+        else if (opcao == 1) {
           break;
         } else if (opcao == 2) {
           printf("Menu do cliente %s\n", cliente_atual.nome);
           printf("1 - Alterar dado\n");
           printf("2 - Dar Baixa na Divida\n");
           printf("3 - Deletar Cliente\n");
+          printf("0 - Sair\n");
           scanf("%d", &escolha2);
           if (escolha2 == 1) {
             alterar_dados_cliente(cliente_atual.id);
@@ -342,7 +389,6 @@ void dar_baixa_na_divida(int id_cliente) {
            cliente_atual.divida);
   }
 
-  // Remove o arquivo original e renomeia o temporário
   if (remove("clientes.txt") != 0) {
     perror("Erro ao remover o arquivo clientes.txt");
   } else {

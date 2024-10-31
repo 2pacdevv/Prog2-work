@@ -9,21 +9,10 @@ int escolha = -1;
 // possivel
 int main() {
   printf("Bem-vindo ao aplicativo de administração de Pub\n");
-
-  while (escolha != 0) {
-    tela_inicial();
-    scanf("%d", &escolha);
-    if (escolha == 0)
-      break;
-    if (escolha == 1) {
-      Cadastrar_cliente();
-    }
-    if (escolha == 2) {
-      verificar_cliente();
-    }
-    if (escolha == 3) {
-      Cadastrar_produto();
-    }
-  }
+  tela_inicial();
+    
+    
+    
+  
   return 0;
 }

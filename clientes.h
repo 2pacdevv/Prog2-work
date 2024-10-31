@@ -11,7 +11,7 @@ struct cliente {
 };
 int gerar_id_unico(FILE *arquivo);
 void Cadastrar_cliente();
-void tela_inicial();
+int tela_inicial();
 void alterar_dados_cliente(int id_cliente);
 void limpar_buffer();
 void verificar_cliente();

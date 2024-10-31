@@ -8,8 +8,9 @@ int id;
 char nome[60];
 float price;
 int qtd;
-char fornecedor[60];
 } produto;
 
 void Cadastrar_produto();
 int gerar_id_unico_produto();
+void alterar_estoque();
+void visualizar_estoque();
