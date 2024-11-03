@@ -1,9 +1,11 @@
 #include "clientes.h"
 #include "produtos.h"
+#include "cores.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 int gerar_id_unico_produto(FILE *arquivo) {
   int id, id_existe;
   do {
@@ -28,7 +30,7 @@ int gerar_id_unico_produto(FILE *arquivo) {
 void Cadastrar_produto() {
   produto *novo_produto = malloc(sizeof(produto));
   if (novo_produto == NULL) {
-    printf("Erro ao alocar memória!\n");
+    printf(VERMELHO "Erro ao alocar memória!\n" RESET);
     return;
   }
 
@@ -37,14 +39,14 @@ void Cadastrar_produto() {
 
   FILE *arquivo = fopen("produtos.txt", "r+");
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo!\n" RESET);
     free(novo_produto);
     return;
   }
 
-  printf("Digite o nome do produto: ");
+  printf(AZUL "Digite o nome do produto: " RESET);
   scanf(" %[^\n]", novo_produto->nome);
-  printf("Digite a quantidade do produto: ");
+  printf(AZUL "Digite a quantidade do produto: " RESET);
   scanf("%d", &nova_quantidade);
   novo_produto->qtd = nova_quantidade;
 
@@ -64,14 +66,14 @@ void Cadastrar_produto() {
 
   if (!produto_existe) {
     novo_produto->id = gerar_id_unico_produto(arquivo);
-    printf("Digite o preço pago pelo produto: ");
+    printf(AZUL "Digite o preço pago pelo produto: " RESET);
     scanf("%f", &novo_produto->price);
   }
   fclose(arquivo);
 
   FILE *arquivo_temp = fopen("produtos_temp.txt", "w");
   if (arquivo_temp == NULL) {
-    printf("Erro ao abrir o arquivo temporário para escrita!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo temporário para escrita!\n" RESET);
     free(novo_produto);
     return;
   }
@@ -97,7 +99,7 @@ void Cadastrar_produto() {
     }
     fclose(arquivo);
   } else {
-    printf("Erro ao abrir o arquivo para leitura!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo para leitura!\n" RESET);
     fclose(arquivo_temp);
     free(novo_produto);
     return;
@@ -115,11 +117,10 @@ void Cadastrar_produto() {
   remove("produtos.txt");
   rename("produtos_temp.txt", "produtos.txt");
 
-  printf("Produto atualizado com sucesso! ID do produto: %d\n", novo_produto->id);
+  printf(VERDE "Produto atualizado com sucesso! ID do produto: %d\n" RESET, novo_produto->id);
 
   free(novo_produto);
 }
-
 
 void alterar_estoque() {
   char nome_produto[100];
@@ -128,18 +129,18 @@ void alterar_estoque() {
 
   FILE *arquivo = fopen("produtos.txt", "r");
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo!\n" RESET);
     return;
   }
 
   FILE *arquivo_temp = fopen("produtos_temp.txt", "w");
   if (arquivo_temp == NULL) {
-    printf("Erro ao criar arquivo temporário!\n");
+    printf(VERMELHO "Erro ao criar arquivo temporário!\n" RESET);
     fclose(arquivo);
     return;
   }
 
-  printf("Digite o nome do produto que deseja alterar: ");
+  printf(AZUL "Digite o nome do produto que deseja alterar: " RESET);
   scanf(" %[^\n]", nome_produto);
 
   produto produto_atual;
@@ -151,17 +152,17 @@ void alterar_estoque() {
 
     if (strcmp(produto_atual.nome, nome_produto) == 0) {
       produto_encontrado = 1;
-      printf("Produto encontrado: %s\n", produto_atual.nome);
+      printf(AZUL "Produto encontrado: %s\n" RESET, produto_atual.nome);
       printf("Quantidade atual: %d\n", produto_atual.qtd);
 
-      printf("Digite a nova quantidade: ");
+      printf(AZUL "Digite a nova quantidade: " RESET);
       scanf("%d", &quantidade_alterada);
       produto_atual.qtd = quantidade_alterada;
 
-      printf("Deseja alterar o preço pago pelo produto? (1 - Sim, 0 - Não): ");
+      printf(AZUL "Deseja alterar o preço pago pelo produto? (1 - Sim, 0 - Não): " RESET);
       scanf("%d", &alterar_preco);
       if (alterar_preco) {
-        printf("Digite o novo preço: ");
+        printf(AZUL "Digite o novo preço: " RESET);
         scanf("%f", &novo_preco);
         produto_atual.price = novo_preco;
       }
@@ -178,49 +179,43 @@ void alterar_estoque() {
   if (produto_encontrado) {
     remove("produtos.txt");
     rename("produtos_temp.txt", "produtos.txt");
-    printf("Estoque atualizado com sucesso!\n");
+    printf(VERDE "Estoque atualizado com sucesso!\n" RESET);
   } else {
-    printf("Produto não encontrado!\n");
+    printf(VERMELHO "Produto não encontrado!\n" RESET);
     remove("produtos_temp.txt");
   }
 }
 
-
 void visualizar_estoque() {
     FILE *arquivo = fopen("produtos.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo de produtos!\n");
+        printf(VERMELHO "Erro ao abrir o arquivo de produtos!\n" RESET);
         return;
     }
 
     produto produto_atual;
     int opcao;
-    long posicao_anterior = 0;
 
     while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\nQuantidade: %d\n\n",
                   &produto_atual.id, produto_atual.nome, &produto_atual.price,
                   &produto_atual.qtd) == 4) {
 
-        printf("\nProduto ID: %d\n", produto_atual.id);
+        printf(AZUL "\nProduto ID: %d\n" RESET, produto_atual.id);
         printf("Nome: %s\n", produto_atual.nome);
         printf("Preço: %.2f\n", produto_atual.price);
         printf("Quantidade: %d\n", produto_atual.qtd);
 
-        printf("\nDigite 1 para o próximo produto ou 0 para parar: ");
+        printf(AZUL "\nDigite 1 para o próximo produto ou 0 para parar: " RESET);
         scanf("%d", &opcao);
 
         if (opcao == 1) {
             continue;
-        } 
-     
-        else {
-            printf("Encerrando visualização.\n");
+        } else {
+            printf(VERDE "Encerrando visualização.\n" RESET);
             break;
         }
     }
 
     fclose(arquivo);
-    printf("\nFim da lista de produtos.\n");
+    printf(VERDE "\nFim da lista de produtos.\n" RESET);
 }
-
-

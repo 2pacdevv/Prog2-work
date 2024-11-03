@@ -1,6 +1,7 @@
 #include "catalogo.h"
 #include "clientes.h"
 #include "produtos.h"
+#include "cores.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,11 +14,11 @@ void visualizar_catalogo() {
 
   FILE *arquivo = fopen("catalogo.txt", "r");
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo de catálogo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo de catálogo!\n" RESET);
     return;
   }
 
-  printf("Escolha uma opção:\n");
+  printf(AZUL "Escolha uma opção:\n" RESET);
   printf("1. Pesquisar produto pelo nome\n");
   printf("2. Visualizar todos os produtos\n");
   printf("Digite a opção desejada: ");
@@ -25,7 +26,7 @@ void visualizar_catalogo() {
   getchar();
 
   if (opcao == 1) {
-    printf("Digite o nome do produto que deseja pesquisar: ");
+    printf(AZUL "Digite o nome do produto que deseja pesquisar: " RESET);
     scanf(" %[^\n]", nome_produto);
 
     int produto_encontrado = 0;
@@ -33,13 +34,13 @@ void visualizar_catalogo() {
                   &produto_atual.id, produto_atual.nome,
                   &produto_atual.price) == 3) {
       if (strstr(produto_atual.nome, nome_produto) != NULL) {
-        printf("Produto encontrado:\n");
+        printf(VERDE "Produto encontrado:\n" RESET);
         printf("ID: %d\nNome: %s\nPreço: %.2f\n", produto_atual.id,
                produto_atual.nome, produto_atual.price);
 
         int continuar;
         do {
-          printf("Digite 1 para continuar ou 0 para sair: ");
+          printf(AZUL "Digite 1 para continuar ou 0 para sair: " RESET);
           scanf("%d", &continuar);
           if (continuar == 0) {
             fclose(arquivo);
@@ -50,10 +51,10 @@ void visualizar_catalogo() {
       }
     }
     if (!produto_encontrado) {
-      printf("Produto não encontrado no catálogo.\n");
+      printf(VERMELHO "Produto não encontrado no catálogo.\n" RESET);
     }
   } else if (opcao == 2) {
-    printf("Visualizando todos os produtos:\n");
+    printf(AZUL "Visualizando todos os produtos:\n" RESET);
     while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n",
                   &produto_atual.id, produto_atual.nome,
                   &produto_atual.price) == 3) {
@@ -62,7 +63,7 @@ void visualizar_catalogo() {
 
       int continuar;
       do {
-        printf("Digite 1 para continuar ou 0 para sair: ");
+        printf(AZUL "Digite 1 para continuar ou 0 para sair: " RESET);
         scanf("%d", &continuar);
         if (continuar == 0) {
           fclose(arquivo);
@@ -71,16 +72,15 @@ void visualizar_catalogo() {
       } while (continuar != 1);
     }
   } else {
-    printf("Opção inválida. Tente novamente.\n");
+    printf(VERMELHO "Opção inválida. Tente novamente.\n" RESET);
   }
 
   fclose(arquivo);
 }
-// funcoes outras ai
 
 void Alterar_Catalogo() {
   int escolha;
-  printf("Escolha oque deseja fazer: \n");
+  printf(AZUL "Escolha o que deseja fazer: \n" RESET);
   printf("1 - Cadastrar Produto da loja\n");
   printf("2 - Alterar Produto da loja\n");
   printf("3 - Excluir Produto da loja\n");
@@ -91,7 +91,9 @@ void Alterar_Catalogo() {
   } else if (escolha == 2) {
     alterar_produto_catalogo();
   } else if (escolha == 3) {
-    excluir_produto_catalogo();
+    excluir_produto();
+  } else {
+    printf(VERMELHO "Opção inválida\n" RESET);
   }
 }
 
@@ -118,45 +120,56 @@ int gerar_id_unico_catalogo(FILE *arquivo) {
 }
 
 void cadastrar_produto_catalogo() {
-  produto_do_Catalogo novo_produto;
-  int produto_existe = 0;
+    produto_do_Catalogo novo_produto;
+    int produto_existe = 0;
 
-  FILE *arquivo = fopen("catalogo.txt", "a+");
-  if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo de catálogo!\n");
-    return;
-  }
+    printf(AZUL "Digite o nome do produto: " RESET);
+    scanf(" %[^\n]", novo_produto.nome);
 
-  printf("Digite o nome do produto: ");
-  scanf(" %[^\n]", novo_produto.nome);
-  printf("Digite o preço do produto: ");
-  scanf("%f", &novo_produto.price);
-
-  rewind(arquivo);
-  produto_do_Catalogo produto_atual;
-
-  while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n",
-                &produto_atual.id, produto_atual.nome,
-                &produto_atual.price) == 3) {
-    if (strcmp(produto_atual.nome, novo_produto.nome) == 0) {
-      produto_existe = 1;
-      break;
+    // Primeira verificação para ver se o produto já existe
+    FILE *arquivo = fopen("catalogo.txt", "r");
+    if (arquivo == NULL) {
+        printf(VERMELHO "Erro ao abrir o arquivo de catálogo!\n" RESET);
+        return;
     }
-  }
 
-  if (produto_existe) {
-    printf("Produto já cadastrado.\n");
-  } else {
+    produto_do_Catalogo produto_atual;
+    while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n",
+                  &produto_atual.id, produto_atual.nome,
+                  &produto_atual.price) == 3) {
+        if (strcmp(produto_atual.nome, novo_produto.nome) == 0) {
+            produto_existe = 1;
+            break;
+        }
+    }
+    fclose(arquivo);
 
+    // Se o produto já existir, não permite o cadastro
+    if (produto_existe) {
+        printf(VERMELHO "Produto já cadastrado.\n" RESET);
+        return;
+    }
+
+    // Se o produto não existir, solicita o preço e cadastra o produto
+    printf(AZUL "Digite o preço do produto: " RESET);
+    scanf("%f", &novo_produto.price);
+
+    arquivo = fopen("catalogo.txt", "a");
+    if (arquivo == NULL) {
+        printf(VERMELHO "Erro ao abrir o arquivo de catálogo!\n" RESET);
+        return;
+    }
+
+    // Gera um ID único para o novo produto e escreve no arquivo
     novo_produto.id = gerar_id_unico_catalogo(arquivo);
     fprintf(arquivo, "ID: %d\nNome: %s\nPreço: %.2f\n\n", novo_produto.id,
             novo_produto.nome, novo_produto.price);
-    printf("Produto cadastrado com sucesso! ID do produto: %d\n",
-           novo_produto.id);
-  }
 
-  fclose(arquivo);
+    printf(VERDE "Produto cadastrado com sucesso! ID do produto: %d\n" RESET, novo_produto.id);
+
+    fclose(arquivo);
 }
+
 
 void alterar_produto_catalogo() {
   char nome_produto[60];
@@ -165,18 +178,17 @@ void alterar_produto_catalogo() {
 
   FILE *arquivo = fopen("catalogo.txt", "r+");
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo de catálogo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo de catálogo!\n" RESET);
     return;
   }
 
-  printf("Digite o nome do produto que deseja alterar: ");
+  printf(AZUL "Digite o nome do produto que deseja alterar: " RESET);
   scanf(" %[^\n]", nome_produto);
 
   long posicao = 0;
-  while (
-      !produto_encontrado &&
-      (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n", &produto_atual.id,
-              produto_atual.nome, &produto_atual.price) == 3)) {
+  while (!produto_encontrado &&
+         (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n", &produto_atual.id,
+                 produto_atual.nome, &produto_atual.price) == 3)) {
 
     if (strcmp(produto_atual.nome, nome_produto) == 0) {
       produto_encontrado = 1;
@@ -187,12 +199,12 @@ void alterar_produto_catalogo() {
   }
 
   if (produto_encontrado) {
-    printf("Produto encontrado!\n");
+    printf(VERDE "Produto encontrado!\n" RESET);
     printf("Nome atual: %s\nPreço atual: %.2f\n", produto_atual.nome,
            produto_atual.price);
 
     int opcao;
-    printf("O que você deseja alterar?\n");
+    printf(AZUL "O que você deseja alterar?\n" RESET);
     printf("1. Nome\n");
     printf("2. Preço\n");
     printf("Escolha uma opção: ");
@@ -200,15 +212,15 @@ void alterar_produto_catalogo() {
 
     switch (opcao) {
     case 1:
-      printf("Digite o novo nome do produto: ");
+      printf(AZUL "Digite o novo nome do produto: " RESET);
       scanf(" %[^\n]", produto_atual.nome);
       break;
     case 2:
-      printf("Digite o novo preço do produto: ");
+      printf(AZUL "Digite o novo preço do produto: " RESET);
       scanf("%f", &produto_atual.price);
       break;
     default:
-      printf("Opção inválida. Nenhuma alteração realizada.\n");
+      printf(VERMELHO "Opção inválida. Nenhuma alteração realizada.\n" RESET);
       fclose(arquivo);
       return;
     }
@@ -216,67 +228,65 @@ void alterar_produto_catalogo() {
     fprintf(arquivo, "ID: %d\nNome: %s\nPreço: %.2f\n\n", produto_atual.id,
             produto_atual.nome, produto_atual.price);
 
-    printf("Produto atualizado com sucesso!\n");
+    printf(VERDE "Produto atualizado com sucesso!\n" RESET);
   } else {
-    printf("Produto não encontrado no catálogo.\n");
+    printf(VERMELHO "Produto não encontrado no catálogo.\n" RESET);
   }
 
   fclose(arquivo);
 }
 
-void excluir_produto_catalogo() {
-  char nome_produto[60];
-  int produto_encontrado = 0;
-  produto_do_Catalogo produto_atual;
 
-  FILE *arquivo = fopen("catalogo.txt", "r");
-  if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo\n");
-    return;
-  }
 
-  FILE *arquivo_temp = fopen("temp_catalogo.txt", "w");
-  if (arquivo_temp == NULL) {
-    printf("Erro ao criar o arquivo\n");
-    fclose(arquivo);
-    return;
-  }
+void excluir_produto() {
+    char nome_produto[60];
+    produto_do_Catalogo produto_encontrado;
+    FILE *arquivo = fopen("catalogo.txt", "r");
+    FILE *temp = fopen("temp_catalogo.txt", "w");
+    int encontrado = 0;
 
-  printf("Digite o nome do produto que deseja excluir: ");
-  scanf(" %[^\n]", nome_produto);
-  printf("Tem certeza que deseja exlcuir o produto %s? ", nome_produto);
-  printf("1 - Sim\n");
-  printf("0 - Não\n");
-  int opcao5;
-  scanf("%d", &opcao5);
-  if (opcao5 == 1) {
+    if (arquivo == NULL || temp == NULL) {
+        printf(VERMELHO "Erro ao abrir o arquivo de catálogo.\n" RESET);
+        if (arquivo) fclose(arquivo);
+        if (temp) fclose(temp);
+        return;
+    }
+
+    printf(AZUL "Digite o nome do produto que deseja excluir: " RESET);
+    scanf(" %[^\n]", nome_produto);
+
     while (fscanf(arquivo, "ID: %d\nNome: %[^\n]\nPreço: %f\n\n",
-                  &produto_atual.id, produto_atual.nome,
-                  &produto_atual.price) == 3) {
-      if (strcmp(produto_atual.nome, nome_produto) == 0) {
-        produto_encontrado = 1;
-        printf("Produto '%s' encontrado e será excluído.\n",
-               produto_atual.nome);
-        continue;
-      }
-      fprintf(arquivo_temp, "ID: %d\nNome: %s\nPreço: %.2f\n\n",
-              produto_atual.id, produto_atual.nome, produto_atual.price);
+                  &produto_encontrado.id, produto_encontrado.nome,
+                  &produto_encontrado.price) == 3) {
+        if (strcmp(produto_encontrado.nome, nome_produto) == 0) {
+            encontrado = 1;
+            printf(VERDE "Produto encontrado: %s (ID: %d, Preço: %.2f)\n" RESET,
+                   produto_encontrado.nome, produto_encontrado.id, produto_encontrado.price);
+            
+            int confirmar;
+            printf(AZUL "Tem certeza que deseja excluir este produto? (1 para sim, 0 para não): " RESET);
+            scanf("%d", &confirmar);
+
+            if (confirmar == 1) {
+                printf(VERDE "Produto '%s' excluído com sucesso.\n" RESET, nome_produto);
+                continue;
+            } 
+            else {
+                printf(VERDE "Exclusão cancelada para o produto '%s'.\n" RESET, nome_produto);
+            }
+        }
+        fprintf(temp, "ID: %d\nNome: %s\nPreço: %.2f\n\n", produto_encontrado.id,
+                produto_encontrado.nome, produto_encontrado.price);
     }
 
-    if (!produto_encontrado) {
-      printf("Produto não encontrado no catálogo.\n");
-    } else {
-      printf("Produto excluído com sucesso!\n");
+    if (!encontrado) {
+        printf(VERMELHO "Produto '%s' não encontrado no catálogo.\n" RESET, nome_produto);
     }
 
     fclose(arquivo);
-    fclose(arquivo_temp);
+    fclose(temp);
 
     remove("catalogo.txt");
     rename("temp_catalogo.txt", "catalogo.txt");
-  }
-
-  else {
-    printf("Operação cancelada.\n");
-  }
 }
+

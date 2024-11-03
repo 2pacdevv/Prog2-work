@@ -3,6 +3,7 @@
 #include "catalogo.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "cores.h"
 int gerar_id_unico(FILE *arquivo) {
   int id;
   int id_existe;
@@ -34,14 +35,14 @@ void Cadastrar_cliente() {
   FILE *arquivo = fopen("clientes.txt", "a+");
   // eu botei um verificador banzas, ele verifica se o arquivo abriu
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo!\n" RESET);
     free(novo_cliente);
     return;
   }
 
-  printf("Digite o nome do cliente: ");
+  printf(AZUL "Digite o nome do cliente: " RESET);
   scanf(" %[^\n]", novo_cliente->nome);
-  printf("Digite a dívida do cliente: ");
+  printf(AZUL "Digite a dívida do cliente: " RESET);
   scanf("%f", &novo_cliente->divida);
   // esse comando rewind permite que o leitor volte desde o começo banza, ai lê
   // tudo de novo e adciona o valor a mais da divida que o usuario gastou
@@ -63,12 +64,12 @@ void Cadastrar_cliente() {
   fclose(arquivo);
   // aqui ele adciona o valor a divida total do cliente
   if (cliente_existe) {
-    printf("Cliente já cadastrado. Atualizando a dívida...\n");
+    printf(VERDE "Cliente já cadastrado. Atualizando a dívida...\n" RESET);
     novo_cliente->divida = divida_total;
   } else { // caso ele n exista, ele abre o arquivo novamente
     arquivo = fopen("clientes.txt", "a+");
     if (arquivo == NULL) {
-      printf("Erro ao abrir o arquivo!\n");
+      printf(VERMELHO "Erro ao abrir o arquivo!\n" RESET);
       free(novo_cliente);
       return;
     }
@@ -76,18 +77,17 @@ void Cadastrar_cliente() {
     // numeros aleatorios, como vamo chama a gerar id unico, é necessario
     srand(time(NULL));
     novo_cliente->id = gerar_id_unico(arquivo);
-    printf("Digite o número do cliente: ");
+    printf(AZUL "Digite o número do cliente: " RESET);
     // se o cliente n existir, o usuario precisa adcionar o numero de telefone
     // desse cliente
     scanf("%s", novo_cliente->numero);
     fclose(arquivo);
   }
   // aqui ele abre um arquivo temporario e verifica se ele conseguiu tambem, eu
-  // criei esse arquivo temporario porque era necessario pra ele manda pro
-  // arquivo real
+  // criei esse arquivo temporario porque era necessario pra ele manda pro arquivo real
   FILE *arquivo_temp = fopen("clientes_temp.txt", "w");
   if (arquivo_temp == NULL) {
-    printf("Erro ao abrir o arquivo temporário para escrita!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo temporário para escrita!\n" RESET);
     free(novo_cliente);
     return;
   }
@@ -107,7 +107,7 @@ void Cadastrar_cliente() {
     }
     fclose(arquivo);
   } else {
-    printf("Erro ao abrir o arquivo para leitura!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo para leitura!\n" RESET);
     fclose(arquivo_temp);
     free(novo_cliente);
     return;
@@ -124,68 +124,58 @@ void Cadastrar_cliente() {
   remove("clientes.txt");
   rename("clientes_temp.txt", "clientes.txt");
 
-  printf("Divida do cliente atualizada com sucesso! ID do cliente: %d\n",
+  printf(VERDE "Divida do cliente atualizada com sucesso! ID do cliente: %d\n" RESET,
          novo_cliente->id);
 
   free(novo_cliente);
 }
 
 
+void tela_inicial() {
+    int opcao;
 
-int tela_inicial() {
-  int opcao;
+    printf(VERDE "-----Menu Principal-----\n" RESET);
+    printf("Digite a funcionalidade que você deseja: \n");
+    printf("0 - Sair\n");
+    printf("1 - Atender Cliente\n");
+    printf("2 - Verificar cliente\n");
+    printf("3 - Cadastrar Produto\n");
+    printf("4 - Alterar estoque\n");
+    printf("5 - Visualizar estoque\n");
+    printf("6 - Catálogo\n");
+    printf("7 - Alterar Catálogo\n");
 
-  printf("-----Menu Principal-----\n");
-  printf("Digite a funcionalidade que você deseja: \n");
-  printf("0 - Sair\n");
-  printf("1 - Atender Cliente\n");
-  printf("2 - Verificar cliente\n");
-  printf("3 - Cadastrar Produto\n");
-  printf("4 - Alterar estoque\n");
-  printf("5 - Visualizar estoque\n");
-  printf("6 - Catálogo\n");
-  printf("7 - Alterar Catálogo\n");
-  printf("8 - Emitir Relatório de vendas do dia\n");
+    printf("Opção: ");
+    scanf("%d", &opcao);
 
-  printf("Opção: ");
-  scanf("%d", &opcao);
-
-  switch (opcao) {
-    case 0:
-        break;
-    case 1:
-      Cadastrar_cliente();
-      return tela_inicial(); 
-      break;
-    case 2:
-      verificar_cliente();
-      return tela_inicial(); 
-      break;
-    case 3:
-      Cadastrar_produto();
-      return tela_inicial(); 
-      break;
-    case 4:
-      alterar_estoque();
-      return tela_inicial(); 
-      break;
-    case 5:
-      visualizar_estoque();
-      return tela_inicial(); 
-      break;
-    case 6:
-      visualizar_catalogo();
-      return tela_inicial(); 
-      break;
-    case 7:
-      Alterar_Catalogo();
-      return tela_inicial(); 
-      break;
-    default:
-      printf("Opção inválida. Tente novamente.\n");
-     return tela_inicial(); 
-  }
-
+    switch (opcao) {
+        case 0:
+            break;
+        case 1:
+            Cadastrar_cliente();
+            return tela_inicial();
+        case 2:
+            verificar_cliente();
+            return tela_inicial();
+        case 3:
+            Cadastrar_produto();
+            return tela_inicial();
+        case 4:
+            alterar_estoque();
+            return tela_inicial();
+        case 5:
+            visualizar_estoque();
+            return tela_inicial();
+        case 6:
+            visualizar_catalogo();
+            return tela_inicial();
+        case 7:
+            Alterar_Catalogo();
+            return tela_inicial();
+        default:
+            printf(VERMELHO "Opção inválida. Tente novamente.\n" RESET);
+            return tela_inicial();
+    }
 }
 
 
@@ -196,7 +186,7 @@ void alterar_dados_cliente(int id_cliente) {
   int encontrado = 0;
 
   if (arquivo == NULL || arquivo_temp == NULL) {
-    printf("Erro ao abrir os arquivos!\n");
+    printf(VERMELHO "Erro ao abrir os arquivos!\n" RESET);
     return;
   }
 
@@ -205,7 +195,7 @@ void alterar_dados_cliente(int id_cliente) {
                 cliente_atual.numero) == 4) {
     if (cliente_atual.id == id_cliente) {
       encontrado = 1;
-      printf("Cliente encontrado. O que você deseja alterar?\n");
+      printf(VERDE "Cliente encontrado. O que você deseja alterar?\n" RESET);
       printf("1. Nome\n");
       printf("2. Número\n");
       printf("Escolha uma opção: ");
@@ -215,15 +205,15 @@ void alterar_dados_cliente(int id_cliente) {
       getchar();
 
       if (opcao == 1) {
-        printf("Novo Nome: ");
+        printf(AZUL "Novo Nome: " RESET);
         fgets(cliente_atual.nome, sizeof(cliente_atual.nome), stdin);
         cliente_atual.nome[strcspn(cliente_atual.nome, "\n")] = 0;
       } else if (opcao == 2) {
-        printf("Novo Número: ");
+        printf(AZUL "Novo Número: " RESET);
         fgets(cliente_atual.numero, sizeof(cliente_atual.numero), stdin);
         cliente_atual.numero[strcspn(cliente_atual.numero, "\n")] = 0;
       } else {
-        printf("Opção inválida!\n");
+        printf(VERMELHO "Opção inválida!\n" RESET);
       }
     }
 
@@ -234,19 +224,19 @@ void alterar_dados_cliente(int id_cliente) {
   }
 
   if (!encontrado) {
-    printf("Cliente com ID %d não encontrado.\n", id_cliente);
+    printf(VERMELHO "Cliente com ID %d não encontrado.\n" RESET, id_cliente);
   }
 
   fclose(arquivo);
   fclose(arquivo_temp);
 
   if (remove("clientes.txt") != 0) {
-    perror("Erro ao excluir o arquivo clientes.txt");
+    perror(VERMELHO "Erro ao excluir o arquivo clientes.txt" RESET);
   } else {
     if (rename("clientes_temp.txt", "clientes.txt") != 0) {
-      perror("Erro ao renomear o arquivo temporário");
+      perror(VERMELHO "Erro ao renomear o arquivo temporário" RESET);
     } else {
-      printf("Dados do cliente alterados com sucesso!\n");
+      printf(VERDE "Dados do cliente alterados com sucesso!\n" RESET);
     }
   }
 }
@@ -265,13 +255,13 @@ void verificar_cliente() {
 
   FILE *arquivo = fopen("clientes.txt", "r");
   if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo!\n");
+    printf(VERMELHO "Erro ao abrir o arquivo!\n" RESET);
     return;
   }
 
   limpar_buffer();
 
-  printf("Digite o nome do cliente que deseja procurar: ");
+  printf(AZUL "Digite o nome do cliente que deseja procurar: " RESET);
   fgets(nome_procurado, 60, stdin);
   nome_procurado[strcspn(nome_procurado, "\n")] = 0;
 
@@ -325,14 +315,14 @@ void verificar_cliente() {
           }
 
         } else {
-          printf("Opção inválida. Tente novamente.\n");
+          printf(VERMELHO "Opção inválida. Tente novamente.\n" RESET);
         }
       }
     }
   }
 
   if (!encontrou) {
-    printf("Cliente com nome '%s' não encontrado.\n", nome_procurado);
+    printf(VERMELHO "Cliente com nome '%s' não encontrado.\n" RESET, nome_procurado);
   }
 
   fclose(arquivo);
@@ -345,7 +335,7 @@ void dar_baixa_na_divida(int id_cliente) {
   int encontrado = 0;
 
   if (arquivo == NULL || arquivo_temp == NULL) {
-    printf("Erro ao abrir os arquivos!\n");
+    printf(VERMELHO "Erro ao abrir os arquivos!\n" RESET);
     return;
   }
 
@@ -354,13 +344,13 @@ void dar_baixa_na_divida(int id_cliente) {
                 cliente_atual.numero) == 4) {
     if (cliente_atual.id == id_cliente) {
       encontrado = 1;
-      printf("Cliente encontrado. Digite o valor que foi pago: \n");
+      printf(VERDE "Cliente encontrado. Digite o valor que foi pago: \n" RESET);
 
       float valor_pago;
       scanf("%f", &valor_pago);
 
       if (valor_pago < 0) {
-        printf("Valor pago inválido. Deve ser maior ou igual a 0.\n");
+        printf(VERMELHO "Valor pago inválido. Deve ser maior ou igual a 0.\n" RESET);
         fclose(arquivo);
         fclose(arquivo_temp);
         return;
@@ -383,19 +373,19 @@ void dar_baixa_na_divida(int id_cliente) {
   fclose(arquivo_temp);
 
   if (!encontrado) {
-    printf("Cliente com ID %d não encontrado.\n", id_cliente);
+    printf(VERMELHO "Cliente com ID %d não encontrado.\n" RESET, id_cliente);
   } else {
-    printf("Dívida atualizada. Dívida atual do cliente: %.2f\n",
+    printf(VERDE "Dívida atualizada. Dívida atual do cliente: %.2f\n" RESET,
            cliente_atual.divida);
   }
 
   if (remove("clientes.txt") != 0) {
-    perror("Erro ao remover o arquivo clientes.txt");
+    perror(VERMELHO "Erro ao remover o arquivo clientes.txt" RESET);
   } else {
     if (rename("clientes_temp.txt", "clientes.txt") != 0) {
-      perror("Erro ao renomear o arquivo temporário");
+      perror(VERMELHO "Erro ao renomear o arquivo temporário" RESET);
     } else {
-      printf("Dados do cliente atualizados com sucesso!\n");
+      printf(VERDE "Dados do cliente atualizados com sucesso!\n" RESET);
     }
   }
 }
@@ -408,7 +398,7 @@ void excluir_cliente(int id_cliente) {
   FILE *arquivo_temp = fopen("clientes_temp.txt", "w");
 
   if (arquivo == NULL || arquivo_temp == NULL) {
-    printf("Erro ao abrir os arquivos!\n");
+    printf(VERMELHO "Erro ao abrir os arquivos!\n" RESET);
     return;
   }
 
@@ -431,15 +421,15 @@ void excluir_cliente(int id_cliente) {
 
   if (encontrado) {
     if (remove("clientes.txt") != 0) {
-      perror("Erro ao remover o arquivo clientes.txt");
+      perror(VERMELHO "Erro ao remover o arquivo clientes.txt" RESET);
     } else if (rename("clientes_temp.txt", "clientes.txt") != 0) {
-      perror("Erro ao renomear o arquivo temporário");
+      perror(VERMELHO "Erro ao renomear o arquivo temporário" RESET);
     } else {
-      printf("Cliente com ID %d excluído com sucesso!\n", id_cliente);
+      printf(VERDE "Cliente com ID %d excluído com sucesso!\n" RESET, id_cliente);
       return;
     }
   } else {
-    printf("Cliente com ID %d não encontrado.\n", id_cliente);
+    printf(VERMELHO "Cliente com ID %d não encontrado.\n" RESET, id_cliente);
     remove("clientes_temp.txt");
   }
 }
