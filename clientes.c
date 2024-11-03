@@ -1,5 +1,6 @@
 #include "clientes.h"
 #include "produtos.h"
+#include "catalogo.h"
 #include <stdio.h>
 #include <stdlib.h>
 int gerar_id_unico(FILE *arquivo) {
@@ -173,11 +174,11 @@ int tela_inicial() {
       return tela_inicial(); 
       break;
     case 6:
-      printf("Alterando catálogo...\n");
+      visualizar_catalogo();
       return tela_inicial(); 
       break;
     case 7:
-      printf("Emitindo relatório de vendas...\n");
+      Alterar_Catalogo();
       return tela_inicial(); 
       break;
     default:
@@ -372,7 +373,6 @@ void dar_baixa_na_divida(int id_cliente) {
       }
     }
 
-    // Escreve os dados no arquivo temporário
     fprintf(arquivo_temp, "ID: %d\n", cliente_atual.id);
     fprintf(arquivo_temp, "Nome: %s\n", cliente_atual.nome);
     fprintf(arquivo_temp, "Dívida: %.2f\n", cliente_atual.divida);
