@@ -210,7 +210,7 @@ void alterar_dados_cliente(int id_cliente) {
         cliente_atual.nome[strcspn(cliente_atual.nome, "\n")] = 0;
       } else if (opcao == 2) {
         printf(AZUL "Novo Número: " RESET);
-        fgets(cliente_atual.numero, sizeof(cliente_atual.numero), stdin);
+        fgets(cliente_atual.numero, 12, stdin);
         cliente_atual.numero[strcspn(cliente_atual.numero, "\n")] = 0;
       } else {
         printf(VERMELHO "Opção inválida!\n" RESET);

@@ -126,7 +126,6 @@ void cadastrar_produto_catalogo() {
     printf(AZUL "Digite o nome do produto: " RESET);
     scanf(" %[^\n]", novo_produto.nome);
 
-    // Primeira verificação para ver se o produto já existe
     FILE *arquivo = fopen("catalogo.txt", "r");
     if (arquivo == NULL) {
         printf(VERMELHO "Erro ao abrir o arquivo de catálogo!\n" RESET);
@@ -144,13 +143,11 @@ void cadastrar_produto_catalogo() {
     }
     fclose(arquivo);
 
-    // Se o produto já existir, não permite o cadastro
     if (produto_existe) {
         printf(VERMELHO "Produto já cadastrado.\n" RESET);
         return;
     }
 
-    // Se o produto não existir, solicita o preço e cadastra o produto
     printf(AZUL "Digite o preço do produto: " RESET);
     scanf("%f", &novo_produto.price);
 
@@ -160,7 +157,6 @@ void cadastrar_produto_catalogo() {
         return;
     }
 
-    // Gera um ID único para o novo produto e escreve no arquivo
     novo_produto.id = gerar_id_unico_catalogo(arquivo);
     fprintf(arquivo, "ID: %d\nNome: %s\nPreço: %.2f\n\n", novo_produto.id,
             novo_produto.nome, novo_produto.price);

@@ -1,0 +1,25 @@
+ID: 69383
+Nome: Banana
+Preço: 2.00
+Quantidade: 50
+
+ID: 40886
+Nome: Limao
+Preço: 3.00
+Quantidade: 500
+
+ID: 52777
+Nome: Agua
+Preço: 2.00
+Quantidade: 300
+
+ID: 56915
+Nome: Produto Teste
+Preço: 2.50
+Quantidade: 500
+
+ID: 77793
+Nome: Arroz
+Preço: 10.00
+Quantidade: 35
+

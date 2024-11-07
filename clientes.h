@@ -7,7 +7,7 @@ struct cliente {
   int id;
   char nome[30];
   float divida;
-  char numero[11];
+  char numero[12];
 };
 int gerar_id_unico(FILE *arquivo);
 void Cadastrar_cliente();
